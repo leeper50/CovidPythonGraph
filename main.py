@@ -9,5 +9,14 @@ import graph
 import csvManipulation
 
 csvManipulation.get_population_csv()
-csvManipulation.combine_csvs()
-graph.build_graph('data/combined.csv')
+combined_csv = csvManipulation.combine_csv('Population')
+# problems :
+# cant graph just 1 plot, list needs item[2] to function
+list = [
+   # ['Density', 'Cases per 100k', 'President'],
+   # ['Density', 'Cases per 100k', 'Governor'],
+    ['Density', 'Cases per 100k', 'Legislature'],
+    ['Population', 'Cases per 100k', ''],
+]
+
+graph.build_graph(combined_csv, list)
