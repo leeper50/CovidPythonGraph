@@ -1,4 +1,3 @@
-from statistics import mean, median
 from numpy import polyfit, poly1d
 
 
@@ -13,11 +12,6 @@ class Party:
                     self.yAxis.append(int(item[1]))
         except SyntaxError:
             print(f"No items matching '{party}' in list")
-        if len(self.xAxis) != 0 and len(self.yAxis) != 0:
-            self.xAverage = mean(self.xAxis)
-            self.yAverage = mean(self.yAxis)
-            self.xMedian = median(self.xAxis)
-            self.yMedian = median(self.yAxis)
 
     def trend_line(self):
         z = polyfit(self.xAxis, self.yAxis, 1)
