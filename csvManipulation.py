@@ -1,31 +1,17 @@
 import os
 import pandas as pd
 
-
-def get_population_csv():
-    not_states = ["Puerto Rico", "District of Columbia", "Guam[8]", "U.S. Virgin Islands[9]",
-                  "American Samoa[10]", "Northern Mariana Islands[11]"]
-
-    df = pd.read_csv('data/table-1.csv', usecols=['State or territory', 'Census population[7][a]'])
-    df.columns = ['State', 'Population']
-    df = df.iloc[1:57, :]
-    for item in not_states:
-        index = df[df['State'] == item].index
-        df.drop(index, inplace=True)
-    df.reset_index(drop=True, inplace=True)
-    df['Population'] = df['Population'].str.replace(',', '').astype(int)
-    df.to_csv('data/temp/01_population.csv', index=False)
-
-
-def combine_csv(sortby='Population'):
-    list1 = os.listdir('data/temp')
+def combine_csv(sort_key='State'):
+    list1 = os.listdir('data/graph_data')
     list2 = []
     for item in list1:
-        list2.append(pd.read_csv(f'data/temp/{item}'))
+        list2.append(pd.read_csv(f'data/graph_data/{item}'))
 
     output = list2[0]
     for i in range(1, len(list2)):
         output = pd.merge(output, list2[i], on='State')
-    output = output.sort_values(by=sortby, ascending=False)
-    output.to_csv(r'data/combined.csv', index=False)
+    output = output.sort_values(by=sort_key, ascending=True)
+    output["Cases per 100k"] = round(output["Total Cases"] / output["Population"] * 100000)
+    output.to_csv('data/combined.csv', index=False)
     return output
+
