@@ -19,4 +19,4 @@ graph_list = [
     ['Population', 'Total Cases', 'President'],
 ]
 
-graph.build_graph(combined_csv, graph_list)
+graph.build_graph(combined_csv, graph_list, True)
