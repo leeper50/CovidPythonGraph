@@ -12,6 +12,7 @@ def combine_csv(sort_key="State"):
         output = pd.merge(output, list2[i], on="State")
     output = output.sort_values(by=sort_key, ascending=True)
     output["Cases per 100k"] = round(output["Total Cases"] / output["Population"] * 100000)
+    output["Deaths per 100k"] = round(output["Deaths"] / output["Population"] * 100000)
     output.to_csv("data/combined.csv", index=False)
     return output
 
