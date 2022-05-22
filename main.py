@@ -12,18 +12,21 @@
 
 import graph
 import csvManipulation
-import covidData
+import dataDownloader
 
-covidData.get()
+dataDownloader.getPopulationData()
+dataDownloader.getCovidData()
 
-combined_csv = csvManipulation.combine_csv()
-graph_list = [
-    ["Density", "Cases per 100k", "President"],
-    # ["Density", "Cases per 100k", "Governor"],
-    ["Density", "Deaths per 100k", "President"],
-    # ["Population", "Total Cases"],
-]
 
-test = graph.GraphWindow(combined_csv, graph_list)
-test.build_window()
-test.show_window()
+# combined_csv = csvManipulation.combine_csv()
+# graph_list = [
+#     ["Density", "Cases per 100k", "President"],
+#     # ["Density", "Cases per 100k", "Governor"],
+#     ["Density", "Deaths per 100k", "President"],
+#     # ["Population", "Total Cases"],
+# ]
+
+# test = graph.GraphWindow(combined_csv, graph_list)
+# test.build_window()
+# test.show_window()
+
