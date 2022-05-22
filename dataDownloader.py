@@ -1,23 +1,25 @@
-from genericpath import exists
 from time import ctime
 from os import path
-import urllib.request
 from numpy import double
+
 import pandas as pd
 import datetime as dt
-
 import requests
 
 # grabs covid data from a github repo by the NewYorkTimes
 def getCovidData():
     covid_data_url = "https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-states.csv"
     file_loc = "data/nyt_case_progress.csv"
+    print(path.exists(file_loc))
 
     # update daily or grab for the first time
-    if not exists(file_loc) or checkDate(file_loc):
-        urllib.request.urlretrieve(covid_data_url, file_loc)
+    if not path.exists(file_loc) or checkDate(file_loc):
+        response = requests.Session().get(covid_data_url)
+        with open(file_loc, "w") as f:
+            f.write(response.text)
+            f.close()
 
-    # load all data into frame and drop non states
+    # load all data into frame and drop non-states
     not_states_list = ["American Samoa", "District of Columbia", "Northern Mariana Islands",
                        "Guam", "Puerto Rico", "Virgin Islands"]
     df = pd.read_csv(file_loc)
@@ -29,14 +31,14 @@ def getCovidData():
     results.columns = ["State", "Total Cases", "Deaths"]
 
     # export results as csv
-    results.to_csv("data/graph_data/03_total_cases.csv", index=False)
+    results.to_csv("data/graph_data/02_total_cases.csv", index=False)
 
 
 def getPopulationData():
     file_loc = "data/graph_data/01_population_stats.csv"
 
     # update daily or grab for the first time
-    if not exists(file_loc) or checkDate(file_loc):
+    if not path.exists(file_loc) or checkDate(file_loc):
         request = govtApiCall()
 
         col_names = ["State", "Population", "Density", "Fips"]
