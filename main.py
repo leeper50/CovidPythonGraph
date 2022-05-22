@@ -8,11 +8,11 @@
 
 # problems :
 # trendline should be created on a per graph basis
+# covidData uses two different time packages, and should problably have either os or genericpath
 
 import graph
 import csvManipulation
 import covidData
-
 
 covidData.get()
 
