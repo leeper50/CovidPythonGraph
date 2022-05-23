@@ -4,49 +4,27 @@ from numpy import double
 
 import pandas as pd
 import datetime as dt
+import io
 import requests
 
-# grabs covid data from a github repo by the NewYorkTimes
-def getCovidData():
-    covid_data_url = "https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-states.csv"
-    file_loc = "data/nyt_case_progress.csv"
-    print(path.exists(file_loc))
 
-    # update daily or grab for the first time
-    if not path.exists(file_loc) or checkDate(file_loc):
-        response = requests.Session().get(covid_data_url)
-        with open(file_loc, "w") as f:
-            f.write(response.text)
-            f.close()
-
-    # load all data into frame and drop non-states
-    not_states_list = ["American Samoa", "District of Columbia", "Northern Mariana Islands",
-                       "Guam", "Puerto Rico", "Virgin Islands"]
-    df = pd.read_csv(file_loc)
-    not_states = df.query(f"state == {not_states_list}")
-    df = df.drop(index=not_states.index, columns=["date", "fips"])
-
-    # keep only recent results
-    results = df.drop_duplicates("state", keep="last")
-    results.columns = ["State", "Total Cases", "Deaths"]
-
-    # export results as csv
-    results.to_csv("data/graph_data/02_total_cases.csv", index=False)
-
+COMBINED_FILE = "data/combined.csv"
 
 def getPopulationData():
-    file_loc = "data/graph_data/01_population_stats.csv"
+    census_data_url = "https://api.census.gov/data"
+    stored_data = "data/graph_data/01_population_stats.csv"
 
     # update daily or grab for the first time
-    if not path.exists(file_loc) or checkDate(file_loc):
-        request = govtApiCall()
+    if not path.exists(stored_data) or checkDate(COMBINED_FILE):
+        request = govtApiCall(census_data_url)
 
         col_names = ["State", "Population", "Density", "Fips"]
-        not_states_list = ["District of Columbia", "Puerto Rico"]
         
+        # load data to frame
         df = pd.DataFrame(columns=col_names, data=request.json()[1:])
 
         # drop non-states
+        not_states_list = ["District of Columbia", "Puerto Rico"]
         not_states = df.query(f"State == {not_states_list}")
         df = df.drop(index=not_states.index, columns=["Fips"])
 
@@ -58,12 +36,34 @@ def getPopulationData():
         # resort to beautify
         df = df.sort_values(by="State")
 
-        # output to storage
-        df.to_csv(file_loc, index=False)
-        
+        # export results as csv
+        df.to_csv(stored_data, index=False)
+
+# grabs covid data from a github repo by the NewYorkTimes
+def getCovidData():
+    covid_data_url = "https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-states.csv"
+    stored_data = "data/graph_data/02_total_cases.csv"
+
+    # update daily or grab for the first time
+    if not path.exists(stored_data) or checkDate(COMBINED_FILE):
+        response = requests.Session().get(covid_data_url)
+        df = pd.read_csv(io.StringIO(response.text), sep=",")
+
+        # load all data into frame and drop non-states
+        not_states_list = ["American Samoa", "District of Columbia", "Northern Mariana Islands",
+                        "Guam", "Puerto Rico", "Virgin Islands"]
+        not_states = df.query(f"state == {not_states_list}")
+        df = df.drop(index=not_states.index, columns=["date", "fips"])
+
+        # keep only recent results
+        results = df.drop_duplicates("state", keep="last")
+        results.columns = ["State", "Total Cases", "Deaths"]
+
+        # export results as csv
+        results.to_csv(stored_data, index=False)
+
 # get population data from census
-def govtApiCall():
-    HOST = "https://api.census.gov/data"
+def govtApiCall(HOST):
     year = "2021"
     dataset = "pep/population"
     base_url = "/".join([HOST, year, dataset])
@@ -73,7 +73,7 @@ def govtApiCall():
     predicates["for"] = "STATE:*"
     return requests.get(base_url, params=predicates)
 
-# return false if file 
+# return false if file has not been updated
 def checkDate(file):
     file_last_modified = ctime(path.getmtime(file))
     today_weekday = dt.datetime.today().strftime("%a")
