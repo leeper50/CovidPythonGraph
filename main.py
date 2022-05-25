@@ -1,5 +1,4 @@
 # future additions:
-# roll the csv files into a single file, try filling arrays at once instead of looping
 # consider making a Graph class where each graph is created and added to the GraphWindow class
 # allow for user input
 # show user potential axes for the graph and color options
@@ -7,25 +6,23 @@
 
 # problems :
 # trendline should be created on a per graph basis
-# covidData uses two different time packages, and should problably have either os or genericpath
+# check time function will not run if a week has passed
 
 import graph
 import csvManipulation
-import dataDownloader
 
-dataDownloader.getPopulationData()
-dataDownloader.getCovidData()
+def main():
+    combined_csv = csvManipulation.get_csv()
+    graph_list = [
+        ["Density", "Cases per 100k", "President"],
+        ["Density", "Cases per 100k", "Governor"],
+        # ["Density", "Deaths per 100k", "President"],
+        ["Population", "Total Cases"],
+    ]
 
+    test = graph.GraphWindow(combined_csv, graph_list)
+    test.build_window()
+    test.show_window()
 
-combined_csv = csvManipulation.combine_csv()
-graph_list = [
-    ["Density", "Cases per 100k", "President"],
-    # ["Density", "Cases per 100k", "Governor"],
-    ["Density", "Deaths per 100k", "President"],
-    # ["Population", "Total Cases"],
-]
-
-test = graph.GraphWindow(combined_csv, graph_list)
-test.build_window()
-test.show_window()
-
+if __name__ == "__main__":
+    main()
