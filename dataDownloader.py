@@ -1,24 +1,22 @@
 from numpy import double
-
 import pandas as pd
 import io
 import requests
 
 
-def getPopulationData():
-    census_data_url = "https://api.census.gov/data"
+def getPopulationData() -> pd.DataFrame:
+    census_data_url: str = "https://api.census.gov/data"
 
     # update daily or grab for the first time
-    request = govtApiCall(census_data_url)
-
-    col_names = ["State", "Population", "Density", "Fips"]
+    request: requests.Response = govtApiCall(census_data_url)
     
     # load data to frame
-    df = pd.DataFrame(columns=col_names, data=request.json()[1:])
+    col_names: list[str] = ["State", "Population", "Density", "Fips"]
+    df: pd.DataFrame = pd.DataFrame(columns=col_names, data=request.json()[1:])
 
     # drop non-states
-    not_states_list = ["District of Columbia", "Puerto Rico"]
-    not_states = df.query(f"State == {not_states_list}")
+    not_states_list: list[str] = ["District of Columbia", "Puerto Rico"]
+    not_states: pd.DataFrame = df.query(f"State == {not_states_list}")
     df = df.drop(index=not_states.index, columns=["Fips"])
 
     # assign pop. density rank
@@ -28,27 +26,29 @@ def getPopulationData():
 
     return df
 
+
 # grabs covid data from a github repo by the NewYorkTimes
-def getCovidData():
+def getCovidData() -> pd.DataFrame:
     covid_data_url = "https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-states.csv"
 
-    response = requests.Session().get(covid_data_url)
-    df = pd.read_csv(io.StringIO(response.text), sep=",")
+    response: requests.Response = requests.Session().get(covid_data_url)
+    df: pd.DataFrame = pd.read_csv(io.StringIO(response.text), sep=",")
 
     # load all data into frame and drop non-states
-    not_states_list = ["American Samoa", "District of Columbia", "Northern Mariana Islands",
+    not_states_list: list[str] = ["American Samoa", "District of Columbia", "Northern Mariana Islands",
                     "Guam", "Puerto Rico", "Virgin Islands"]
-    not_states = df.query(f"state == {not_states_list}")
+    not_states: pd.DataFrame = df.query(f"state == {not_states_list}")
     df = df.drop(index=not_states.index, columns=["date", "fips"])
 
     # keep only recent results
-    results = df.drop_duplicates("state", keep="last")
+    results: pd.DataFrame = df.drop_duplicates("state", keep="last")
     results.columns = ["State", "Total Cases", "Deaths"]
 
     return results
 
+
 # get population data from census
-def govtApiCall(HOST):
+def govtApiCall(HOST) -> requests.Response:
     year = "2021"
     dataset = "pep/population"
     base_url = "/".join([HOST, year, dataset])

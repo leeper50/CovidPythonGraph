@@ -4,25 +4,25 @@
 # show user potential axes for the graph and color options
 # update graph in real time when user submits change
 
-# problems :
+# problems:
 # trendline should be created on a per graph basis
-# check time function will not run if a week has passed
 
-import graph
-import csvManipulation
+from graph import GraphWindow
+from csvManipulation import get_csv
+import pandas
 
-def main():
-    combined_csv = csvManipulation.get_csv()
+
+def main() -> None:
     graph_list = [
+        ["Density", "Cases per 100k"],
         ["Density", "Cases per 100k", "President"],
-        ["Density", "Cases per 100k", "Governor"],
-        # ["Density", "Deaths per 100k", "President"],
-        ["Population", "Total Cases"],
+        # ["Density", "Cases per 100k", "Governor"],
+        # ["Density", "Cases per 100k", "Legislature"],
     ]
-
-    test = graph.GraphWindow(combined_csv, graph_list)
+    combined_csv: pandas.DataFrame = get_csv()
+    test: GraphWindow = GraphWindow(combined_csv, graph_list)
     test.build_window()
-    test.show_window()
+
 
 if __name__ == "__main__":
     main()
