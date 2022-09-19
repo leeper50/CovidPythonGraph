@@ -1,0 +1,8 @@
+# future additions:
+ - show user potential axes for the graph and color options
+ - allow for user input
+ - update graph in real time when user submits change
+
+# done:
+ - make graph class to store graph specific data
+ - let trendline work per graph
