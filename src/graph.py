@@ -1,11 +1,14 @@
 from dataclasses import dataclass, field
+from pandas import DataFrame
 import numpy as np
 import matplotlib.pyplot as plt
+
 
 @dataclass
 class Graph:
     list: list[str]
     trendline: bool = field(kw_only=True, default=False)
+
 
 class GraphWindow:
     plt.style.use("fivethirtyeight")
@@ -16,7 +19,7 @@ class GraphWindow:
     }
 
     # contains window settings
-    def __init__(self, dataframe, graphs: list[Graph]) -> None:
+    def __init__(self, dataframe: DataFrame, graphs: list[Graph]) -> None:
         GraphWindow.df = dataframe
         self.graphs: list[Graph] = graphs
         fig, self.axs = plt.subplots(len(graphs))
@@ -39,12 +42,13 @@ class GraphWindow:
             self.axs[id].scatter(x, y, color=color)
             if graph.trendline and x:
                 p = np.poly1d(np.polyfit(x, y, 1))
-                self.axs[id].plot(x, p(x), color, linewidth=1, antialiased=True) 
+                self.axs[id].plot(
+                    x, p(x), color, linewidth=1, antialiased=True)
 
-        
         if (len(graph.list) == 3):
             xaxis, yaxis, voting_record = graph.list
-            self.axs[id].set_title(f"{xaxis} by {yaxis} colored by {voting_record}")
+            self.axs[id].set_title(
+                f"{xaxis} by {yaxis} colored by {voting_record}")
             for party, color in GraphWindow.party_dict.items():
                 df = GraphWindow.df[GraphWindow.df[voting_record] == party]
                 plot(df, color)
@@ -54,4 +58,3 @@ class GraphWindow:
             self.axs[id].set_title(f"{xaxis} by {yaxis}")
             df = GraphWindow.df
             plot(df, color)
-            
