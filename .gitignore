@@ -1,4 +1,4 @@
-/src/__pycache__
-/.vscode
-data/combined.csv
 /.venv
+/.vscode
+/src/__pycache__
+data/combined.csv

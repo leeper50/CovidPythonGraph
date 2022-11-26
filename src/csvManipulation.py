@@ -16,8 +16,10 @@ def get_csv(sort_key="State") -> DataFrame:
     data: list[DataFrame] = [getCovidData(), getPopData(),
                              read_csv("data/politics.csv")]
 
-    merged_data: DataFrame = (reduce(lambda left, right: merge(left, right, on="State"), data)
-                              .sort_values(by=sort_key))
+    merged_data: DataFrame = (
+        reduce(lambda left, right: merge(left, right, on="State"), data)
+        .sort_values(by=sort_key)
+    )
     merged_data["Population"] = merged_data["Population"].astype(int)
     merged_data["Cases per 100k"] = round(
         merged_data["Total Cases"] / merged_data["Population"] * 100000)
